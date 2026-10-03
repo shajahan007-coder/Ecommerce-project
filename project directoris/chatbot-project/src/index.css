@@ -1,0 +1,18 @@
+* {
+            box-sizing: border-box;
+        }
+
+          #root {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }

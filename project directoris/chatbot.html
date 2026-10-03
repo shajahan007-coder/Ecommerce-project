@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+            * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        #root {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        /* Chat container wrapping everything */
+        .chat-container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+            overflow: hidden;
+        }
+
+        /* Messages scroll area */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Individual message row */
+        .message-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            max-width: 80%;
+        }
+
+        .message-row.robot {
+            align-self: flex-start;
+        }
+
+        .message-row.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-row img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .message-bubble {
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message-row.robot .message-bubble {
+            background: #e4e6eb;
+            color: #050505;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-row.user .message-bubble {
+            background: #2563eb;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Input area at bottom */
+        .input-area {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .input-area input:focus {
+            border-color: #2563eb;
+        }
+
+        .input-area button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .input-area button:hover {
+            background: #1d4ed8;
+        }
+    </style>
+    
+</head>
+
+<body>
+
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/supersimpledev/react.js"></script>
+    <script src="https://unpkg.com/supersimpledev/chatbot.js"></script>
+    <script src="https://unpkg.com/supersimpledev/react-dom.js"></script>
+    <script src="https://unpkg.com/supersimpledev/babel.js"></script>
+
+    <script type="text/babel">
+
+
+        function ChatBot({ chatMessages, setChatMessages }) {
+            const [inputText, setInputText] = React.useState("");
+            function saveInputText(event) {
+                setInputText(event.target.value);
+            }
+
+
+            function sendMessage() {
+
+                const newChatMessages = [...chatMessages, { message: inputText, sender: "user" }];
+
+                setChatMessages(newChatMessages);
+
+                const response = Chatbot.getResponse(inputText);
+                setChatMessages([...newChatMessages, { message: response, sender: "robot" }]);
+
+                setInputText("");
+            }
+
+            return (
+                <div className="input-area">
+                    <input placeholder="type your message here" size="30" onChange={saveInputText} value={inputText} />
+                    <button onClick={sendMessage}>Send</button>
+
+                </div>
+            );
+        }
+
+        // function ChatMessage(props)
+        function ChatMessage({ message, sender }) {
+            // const message = props.message;
+            // const sender = props.sender;
+            //or
+            // const {message , sender } = props;
+
+            // if(sender === "user"){
+            //     return (
+            //     <div>   
+            //     <img src="data:image/webp;base64,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" width="50"/>
+            //         {message}
+            //         </div>
+            //     )
+
+            // }
+
+
+            return (
+                <div className={`message-row ${sender}`}>
+                    {sender === "robot" && <img src="data:image/webp;base64,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" width="50" />}
+                    {message}
+                    {sender === "user" && <img src="https://th.bing.com/th/id/OIP.42Jq497fBP5X4tmSBFh1TQHaHa?w=188&h=188&c=7&r=0&o=7&pid=1.7&rm=3" width="50" />}
+                </div>
+            )
+
+        }
+
+        function ChatMessages({ chatMessages }) {
+
+            return (
+                <div className="messages-area">
+                    {/* <button onClick={sendMessages}>Send</button> */}
+                    {chatMessages.map((msg, index) => {
+                        return (
+                            <ChatMessage key={index} message={msg.message} sender={msg.sender} />
+                        );
+                    })}
+                </div>
+            )
+        }
+
+        // function sendMessage() {
+        //     Messages.push({ message: "New message", sender: "user" }); //for random id crypto.randomUUID() or Math.random() or Date.now()
+        //     console.log(Messages)
+        // }
+
+        function App() {
+            //this is shortcut for below one and it is also called array destructuring   
+            const [chatMessages, setChatMessages] = React.useState([
+                { message: "Hello, how are you?", sender: "user" },
+                { message: "I'm doing well, thank you!", sender: "robot" },
+                { message: "That's great to hear!", sender: "user" },
+                { message: "How can I assist you today?", sender: "robot" }
+            ])
+
+            //const [chatMessages, setChatMessages] = array; //shortcut for below two and it is also called array destructuring
+            // const chatMessages = array[0];
+            // const setChatMessages = array[1];
+
+            // function sendMessages() {
+            //     setChatMessages([...chatMessages, { message: "New message", sender: "user" }]);
+            // }
+
+            return (
+                <div className="chat-container">
+                    {/* <button onClick={sendMessages}>Send</button> */}
+
+                    <ChatBot chatMessages={chatMessages} setChatMessages={setChatMessages} />
+                    <ChatMessages chatMessages={chatMessages} />
+
+                </div>
+            )
+        }
+
+        const container = document.getElementById('root');
+        ReactDOM.createRoot(container).render(<App />); //const app = {} ippadi use panna render(app) otherwise if function use like this
+
+
+
+
+    </script>
+</body>
+
+</html>
